@@ -474,14 +474,18 @@ export class RoundEngine {
 
         console.log('electLeader: Timer started successfully for game', game.id);
       }
-    } else if (game.state.public.currentRound > 1 && oldLeaderId && oldLeaderId !== leaderId) {
-      // Resume timer after new leader elected in rounds 2+ (usurp scenario)
-      console.log(`electLeader: New leader elected in round ${game.state.public.currentRound}, resuming timer`);
+    } else if (game.state.public.currentRound > 1 && oldLeaderId) {
+      // Resume timer after vote completes in rounds 2+ (whether leader changed or not)
+      console.log(`electLeader: Vote completed in round ${game.state.public.currentRound}, resuming timer`);
       this.timerManager.resumeTimer(game.id);
 
       // Broadcast that game is resuming
+      const message = oldLeaderId !== leaderId
+        ? 'New leader elected - round resuming!'
+        : 'Leader vote completed - round resuming!';
+
       eventBus.broadcast(game.id, ServerEventType.GAME_RESUMED, {
-        reason: 'New leader elected - round resuming!'
+        reason: message
       }, 'PUBLIC');
     }
 
