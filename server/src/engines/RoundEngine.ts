@@ -448,22 +448,23 @@ export class RoundEngine {
       tied: false
     });
 
-    // If this is round 1 and both rooms have leaders, START the timer (not resume)
-    if (game.state.public.currentRound === 1) {
+    // If this is round 1 and both rooms have leaders for the FIRST TIME, START the timer
+    if (game.state.public.currentRound === 1 && !oldLeaderId) {
       const roomA = game.state.rooms.ROOM_A;
       const roomB = game.state.rooms.ROOM_B;
 
-      console.log('electLeader: Checking if timer should start', {
+      console.log('electLeader: Checking if timer should start (first leaders)', {
         gameId: game.id,
         currentRound: game.state.public.currentRound,
         roomALeader: roomA.leaderId,
-        roomBLeader: roomB.leaderId
+        roomBLeader: roomB.leaderId,
+        oldLeaderId
       });
 
       if (roomA.leaderId && roomB.leaderId) {
-        // Both leaders elected, START the timer
+        // Both leaders elected for the first time, START the timer
         const duration = game.config.roundDurations[0]; // Round 1 duration
-        console.log('electLeader: Both leaders elected, starting timer with duration:', duration);
+        console.log('electLeader: Both leaders elected for first time, starting timer with duration:', duration);
 
         this.timerManager.startTimer(game.id, duration, () => {
           this.onRoundTimerExpired(game);
@@ -476,8 +477,8 @@ export class RoundEngine {
 
         console.log('electLeader: Timer started successfully for game', game.id);
       }
-    } else if (game.state.public.currentRound > 1 && oldLeaderId) {
-      // Resume timer after vote completes in rounds 2+ (whether leader changed or not)
+    } else if (oldLeaderId) {
+      // Resume timer after vote completes (in ANY round where there was a previous leader)
       console.log(`electLeader: Vote completed in round ${game.state.public.currentRound}, resuming timer`);
       this.timerManager.resumeTimer(game.id);
 
