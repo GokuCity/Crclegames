@@ -115,14 +115,16 @@ class TimerManager {
 
     console.log('resumeTimer: Resuming timer', { gameId, remaining: timer.remaining, pausedAt: timer.pausedAt });
 
-    // Adjust start time to account for pause
-    const pauseDuration = Date.now() - timer.pausedAt;
-    timer.startTime += pauseDuration;
+    // Update duration to be the remaining time and reset start time
+    // This ensures the timer continues from where it left off
+    timer.duration = timer.remaining;
+    timer.startTime = Date.now();
     timer.state = 'RUNNING';
+    timer.pausedAt = undefined;
 
     timer.interval = setInterval(() => this.tick(gameId), 100);
 
-    console.log('resumeTimer: Timer resumed successfully', { gameId, newState: timer.state });
+    console.log('resumeTimer: Timer resumed successfully', { gameId, newState: timer.state, newDuration: timer.duration });
     this.broadcastTimerState(gameId, timer);
   }
 
