@@ -86,57 +86,79 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   if (publicState.status === GameStatus.FINISHED) {
     return (
-      <div style={styles.container}>
-        <h1>Game Finished!</h1>
-        <div style={styles.winner}>
-          <h2>Game Over - Check your role to see if you won!</h2>
+      <div className="max-w-full mx-auto p-4 font-sans sm:max-w-2xl md:max-w-4xl lg:max-w-6xl">
+        <h1 className="text-2xl font-bold text-center sm:text-3xl">Game Finished!</h1>
+        <div className="bg-game-gold p-6 rounded-lg text-center mt-6 sm:p-8">
+          <h2 className="text-xl font-bold sm:text-2xl">
+            Game Over - Check your role to see if you won!
+          </h2>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h1>Two Rooms and a Boom</h1>
+    <div className="max-w-full mx-auto p-4 font-sans sm:max-w-2xl md:max-w-4xl lg:max-w-6xl">
+      <div className="text-center mb-5">
+        <h1 className="text-2xl font-bold sm:text-3xl">Two Rooms and a Boom</h1>
         {isRoundActive && (
-          <div style={styles.timer}>
-            <div style={styles.roundInfo}>Round {publicState.currentRound || 1}</div>
-            <div style={styles.timerValue}>
+          <div className="flex justify-center items-center gap-4 mt-2 flex-wrap">
+            <div className="text-base font-bold sm:text-lg">
+              Round {publicState.currentRound || 1}
+            </div>
+            <div className="text-2xl font-bold font-mono text-game-red sm:text-3xl md:text-4xl">
               {formatTime(publicState.timer?.remaining || 0)}
             </div>
           </div>
         )}
       </div>
 
-      <div style={styles.roleCard}>
-        <div style={styles.roleLabel}>Your Role:</div>
-        <div style={styles.roleName}>{playerPrivate?.role || 'Unknown'}</div>
-        <div style={styles.roleTeam}>
+      <div className="bg-gray-100 p-4 rounded-lg text-center mb-6 sm:p-5 md:p-6">
+        <div className="text-xs text-gray-500 mb-1 sm:text-sm">Your Role:</div>
+        <div className="text-xl font-bold mb-2 sm:text-2xl">
+          {playerPrivate?.role || 'Unknown'}
+        </div>
+        <div className="text-sm text-game-gray-dark sm:text-base">
           Team: {playerPrivate?.team || 'Unknown'}
-          {isLeader && <span style={styles.leaderBadge}>LEADER</span>}
+          {isLeader && (
+            <span className="ml-2 bg-game-gold text-black px-2 py-0.5 rounded text-xs font-bold sm:text-sm">
+              LEADER
+            </span>
+          )}
         </div>
       </div>
 
-      <div style={styles.rooms}>
-        <div style={{ ...styles.room, ...(myRoom === RoomId.ROOM_A && styles.myRoom) }}>
-          <h2>
-            Room A {myRoom === RoomId.ROOM_A && <span style={styles.yourRoomBadge}>You are here</span>}
+      <div className="grid grid-cols-1 gap-4 mb-5 md:grid-cols-2 md:gap-5">
+        {/* Room A */}
+        <div className={`bg-white border-2 rounded-lg p-4 sm:p-5
+                         ${myRoom === RoomId.ROOM_A
+                           ? 'border-game-green bg-green-50'
+                           : 'border-gray-300'}`}>
+          <h2 className="text-lg font-bold mb-3 sm:text-xl">
+            Room A
+            {myRoom === RoomId.ROOM_A && (
+              <span className="text-sm font-normal text-game-green ml-2">
+                You are here
+              </span>
+            )}
           </h2>
-          <div style={styles.playerList}>
+          <div className="mt-3 max-h-64 overflow-y-auto scrollable sm:max-h-96">
             {roomAPlayers.map((player) => (
-              <div key={player.id} style={styles.player}>
-                <span>{player.name}</span>
-                {player.isLeader && <span style={styles.badge}>LEADER</span>}
+              <div key={player.id} className="flex items-center gap-2 p-2 border-b border-gray-200 min-h-touch flex-wrap">
+                <span className="flex-1 text-sm sm:text-base">{player.name}</span>
+                {player.isLeader && (
+                  <span className="bg-game-gold text-black px-2 py-0.5 rounded text-xs font-bold">
+                    LEADER
+                  </span>
+                )}
                 {myRoom === RoomId.ROOM_A && !player.isLeader && isLeader && isHostageSelectionPhase && (
                   <button
                     onClick={() => onSelectHostage(RoomId.ROOM_A, player.id)}
-                    style={{
-                      ...styles.smallButton,
-                      ...(publicState.rooms?.ROOM_A?.hostageCandidates?.includes(player.id)
-                        ? styles.smallButtonSelected
-                        : {})
-                    }}
+                    className={`min-h-touch px-3 py-2 text-xs rounded border font-bold
+                                transition-all sm:text-sm active:scale-95
+                                ${publicState.rooms?.ROOM_A?.hostageCandidates?.includes(player.id)
+                                  ? 'bg-game-green text-white border-game-green'
+                                  : 'bg-white text-game-green border-game-green'}`}
                   >
                     {publicState.rooms?.ROOM_A?.hostageCandidates?.includes(player.id)
                       ? '✓ Selected'
@@ -147,46 +169,59 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             ))}
           </div>
           {myRoom === RoomId.ROOM_A && isLeader && isHostageSelectionPhase && (
-            <div>
-              <p style={styles.hostageCounter}>
+            <div className="mt-4">
+              <p className="text-sm mb-2 text-center font-bold">
                 Selected: {publicState.rooms?.ROOM_A?.hostageCandidates?.length || 0} / {requiredHostageCount}
               </p>
               <button
                 onClick={() => onLockHostages(RoomId.ROOM_A)}
                 disabled={(publicState.rooms?.ROOM_A?.hostageCandidates?.length || 0) !== requiredHostageCount || publicState.rooms?.ROOM_A?.hostagesLocked}
-                style={{
-                  ...styles.button,
-                  ...(publicState.rooms?.ROOM_A?.hostagesLocked
-                    ? styles.buttonLocked
-                    : (publicState.rooms?.ROOM_A?.hostageCandidates?.length || 0) === requiredHostageCount
-                    ? styles.buttonEnabled
-                    : styles.buttonDisabled)
-                }}
+                className={`w-full min-h-touch px-6 py-3 text-sm rounded-lg border-none font-bold
+                            transition-all sm:text-base
+                            ${publicState.rooms?.ROOM_A?.hostagesLocked
+                              ? 'bg-game-blue text-white cursor-not-allowed opacity-80'
+                              : (publicState.rooms?.ROOM_A?.hostageCandidates?.length || 0) === requiredHostageCount
+                              ? 'bg-game-green text-white cursor-pointer active:scale-95'
+                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
               >
-                {publicState.rooms?.ROOM_A?.hostagesLocked ? '✓ Locked - Waiting for other room' : 'Lock Hostages'}
+                {publicState.rooms?.ROOM_A?.hostagesLocked
+                  ? '✓ Locked - Waiting for other room'
+                  : 'Lock Hostages'}
               </button>
             </div>
           )}
         </div>
 
-        <div style={{ ...styles.room, ...(myRoom === RoomId.ROOM_B && styles.myRoom) }}>
-          <h2>
-            Room B {myRoom === RoomId.ROOM_B && <span style={styles.yourRoomBadge}>You are here</span>}
+        {/* Room B */}
+        <div className={`bg-white border-2 rounded-lg p-4 sm:p-5
+                         ${myRoom === RoomId.ROOM_B
+                           ? 'border-game-green bg-green-50'
+                           : 'border-gray-300'}`}>
+          <h2 className="text-lg font-bold mb-3 sm:text-xl">
+            Room B
+            {myRoom === RoomId.ROOM_B && (
+              <span className="text-sm font-normal text-game-green ml-2">
+                You are here
+              </span>
+            )}
           </h2>
-          <div style={styles.playerList}>
+          <div className="mt-3 max-h-64 overflow-y-auto scrollable sm:max-h-96">
             {roomBPlayers.map((player) => (
-              <div key={player.id} style={styles.player}>
-                <span>{player.name}</span>
-                {player.isLeader && <span style={styles.badge}>LEADER</span>}
+              <div key={player.id} className="flex items-center gap-2 p-2 border-b border-gray-200 min-h-touch flex-wrap">
+                <span className="flex-1 text-sm sm:text-base">{player.name}</span>
+                {player.isLeader && (
+                  <span className="bg-game-gold text-black px-2 py-0.5 rounded text-xs font-bold">
+                    LEADER
+                  </span>
+                )}
                 {myRoom === RoomId.ROOM_B && !player.isLeader && isLeader && isHostageSelectionPhase && (
                   <button
                     onClick={() => onSelectHostage(RoomId.ROOM_B, player.id)}
-                    style={{
-                      ...styles.smallButton,
-                      ...(publicState.rooms?.ROOM_B?.hostageCandidates?.includes(player.id)
-                        ? styles.smallButtonSelected
-                        : {})
-                    }}
+                    className={`min-h-touch px-3 py-2 text-xs rounded border font-bold
+                                transition-all sm:text-sm active:scale-95
+                                ${publicState.rooms?.ROOM_B?.hostageCandidates?.includes(player.id)
+                                  ? 'bg-game-green text-white border-game-green'
+                                  : 'bg-white text-game-green border-game-green'}`}
                   >
                     {publicState.rooms?.ROOM_B?.hostageCandidates?.includes(player.id)
                       ? '✓ Selected'
@@ -197,23 +232,24 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             ))}
           </div>
           {myRoom === RoomId.ROOM_B && isLeader && isHostageSelectionPhase && (
-            <div>
-              <p style={styles.hostageCounter}>
+            <div className="mt-4">
+              <p className="text-sm mb-2 text-center font-bold">
                 Selected: {publicState.rooms?.ROOM_B?.hostageCandidates?.length || 0} / {requiredHostageCount}
               </p>
               <button
                 onClick={() => onLockHostages(RoomId.ROOM_B)}
                 disabled={(publicState.rooms?.ROOM_B?.hostageCandidates?.length || 0) !== requiredHostageCount || publicState.rooms?.ROOM_B?.hostagesLocked}
-                style={{
-                  ...styles.button,
-                  ...(publicState.rooms?.ROOM_B?.hostagesLocked
-                    ? styles.buttonLocked
-                    : (publicState.rooms?.ROOM_B?.hostageCandidates?.length || 0) === requiredHostageCount
-                    ? styles.buttonEnabled
-                    : styles.buttonDisabled)
-                }}
+                className={`w-full min-h-touch px-6 py-3 text-sm rounded-lg border-none font-bold
+                            transition-all sm:text-base
+                            ${publicState.rooms?.ROOM_B?.hostagesLocked
+                              ? 'bg-game-blue text-white cursor-not-allowed opacity-80'
+                              : (publicState.rooms?.ROOM_B?.hostageCandidates?.length || 0) === requiredHostageCount
+                              ? 'bg-game-green text-white cursor-pointer active:scale-95'
+                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
               >
-                {publicState.rooms?.ROOM_B?.hostagesLocked ? '✓ Locked - Waiting for other room' : 'Lock Hostages'}
+                {publicState.rooms?.ROOM_B?.hostagesLocked
+                  ? '✓ Locked - Waiting for other room'
+                  : 'Lock Hostages'}
               </button>
             </div>
           )}
@@ -236,11 +272,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         console.log('Voting UI state:', { myRoom, hasVoted, votingActive, voteCount, totalPlayers, leaderVotes: myRoomState.leaderVotes });
 
         return (
-          <div style={styles.actions}>
+          <div className="bg-white p-4 rounded-lg mt-5 sm:p-5">
             {votingActive && (
               <>
-                <h3>Vote for Leader ({voteCount}/{totalPlayers} voted)</h3>
-                <div style={styles.nominationButtons}>
+                <h3 className="text-lg font-bold mb-3 sm:text-xl">
+                  Vote for Leader ({voteCount}/{totalPlayers} voted)
+                </h3>
+                <div className="flex flex-wrap gap-2 mt-2 sm:gap-3">
                   {myRoomPlayers.map((player) => {
                     const isSelected = hasVoted && myRoomState.leaderVotes[playerId] === player.id;
                     return (
@@ -250,21 +288,24 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                           console.log('Voting for:', player.name, player.id);
                           onNominateLeader(myRoom, player.id);
                         }}
-                        style={{
-                          ...styles.voteButton,
-                          ...(isSelected ? styles.voteButtonSelected : styles.voteButtonUnselected),
-                          ...(hasVoted && !isSelected ? styles.voteButtonDisabled : {})
-                        }}
                         disabled={hasVoted && !isSelected}
+                        className={`min-h-touch min-w-touch px-4 py-3 text-sm rounded-lg border-2 font-bold
+                                    transition-all flex-1 sm:flex-initial
+                                    ${isSelected
+                                      ? 'bg-game-green text-white border-game-green'
+                                      : hasVoted
+                                      ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed opacity-60'
+                                      : 'bg-white text-game-gray-dark border-gray-300 cursor-pointer active:scale-95'}
+                                    sm:min-w-[120px]`}
                       >
                         {player.name}
-                        {isSelected && <span style={styles.checkmark}> ✓</span>}
+                        {isSelected && <span className="text-base font-bold ml-1"> ✓</span>}
                       </button>
                     );
                   })}
                 </div>
                 {hasVoted && (
-                  <p style={styles.votedMessage}>
+                  <p className="text-sm text-game-green font-bold mt-3 text-center">
                     ✓ You voted for {myRoomPlayers.find(p => p.id === myRoomState.leaderVotes[playerId])?.name}
                   </p>
                 )}
@@ -273,7 +314,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             {!votingActive && !isLeader && publicState.currentRound > 1 && (
               <button
                 onClick={() => onInitiateNewLeaderVote(myRoom)}
-                style={{ ...styles.button, ...styles.buttonEnabled }}
+                className="w-full min-h-touch px-6 py-3 text-base rounded-lg border-none font-bold
+                           transition-all cursor-pointer bg-game-green text-white active:scale-95"
               >
                 Vote for New Leader
               </button>
@@ -283,233 +325,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       })()}
 
       {publicState.paused && !isHostageSelectionPhase && (
-        <div style={styles.pausedOverlay}>
-          <div style={styles.pausedMessage}>
-            <h2>Game Paused</h2>
-            <p>{publicState.pauseReason || 'Waiting...'}</p>
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
+          <div className="bg-white p-8 rounded-lg text-center max-w-sm sm:p-10 sm:max-w-md">
+            <h2 className="text-xl font-bold mb-3 sm:text-2xl">Game Paused</h2>
+            <p className="text-base sm:text-lg">
+              {publicState.pauseReason || 'Waiting...'}
+            </p>
           </div>
         </div>
       )}
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '20px',
-    fontFamily: 'Arial, sans-serif'
-  },
-  header: {
-    textAlign: 'center' as const,
-    marginBottom: '20px'
-  },
-  timer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '20px',
-    marginTop: '10px'
-  },
-  roundInfo: {
-    fontSize: '18px',
-    fontWeight: 'bold'
-  },
-  timerValue: {
-    fontSize: '32px',
-    fontWeight: 'bold',
-    fontFamily: 'monospace',
-    color: '#ff6b6b'
-  },
-  roleCard: {
-    backgroundColor: '#f0f0f0',
-    padding: '20px',
-    borderRadius: '8px',
-    textAlign: 'center' as const,
-    marginBottom: '30px'
-  },
-  roleLabel: {
-    fontSize: '14px',
-    color: '#666',
-    marginBottom: '5px'
-  },
-  roleName: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    marginBottom: '10px'
-  },
-  roleTeam: {
-    fontSize: '16px',
-    color: '#333'
-  },
-  leaderBadge: {
-    marginLeft: '10px',
-    backgroundColor: '#FFD700',
-    color: '#000',
-    padding: '2px 8px',
-    borderRadius: '3px',
-    fontSize: '12px',
-    fontWeight: 'bold'
-  },
-  rooms: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '20px',
-    marginBottom: '20px'
-  },
-  room: {
-    backgroundColor: '#fff',
-    border: '2px solid #ccc',
-    borderRadius: '8px',
-    padding: '20px'
-  },
-  myRoom: {
-    borderColor: '#4CAF50',
-    backgroundColor: '#e8f5e9'
-  },
-  yourRoomBadge: {
-    fontSize: '14px',
-    fontWeight: 'normal',
-    color: '#4CAF50'
-  },
-  playerList: {
-    marginTop: '15px'
-  },
-  player: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '8px',
-    borderBottom: '1px solid #eee'
-  },
-  badge: {
-    backgroundColor: '#FFD700',
-    color: '#000',
-    padding: '2px 6px',
-    borderRadius: '3px',
-    fontSize: '10px',
-    fontWeight: 'bold'
-  },
-  actions: {
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '8px',
-    marginTop: '20px'
-  },
-  nominationButtons: {
-    display: 'flex',
-    flexWrap: 'wrap' as const,
-    gap: '10px',
-    marginTop: '10px'
-  },
-  button: {
-    padding: '12px 24px',
-    fontSize: '14px',
-    borderRadius: '5px',
-    border: 'none',
-    cursor: 'pointer',
-    fontWeight: 'bold'
-  },
-  buttonEnabled: {
-    backgroundColor: '#4CAF50',
-    color: 'white'
-  },
-  buttonDisabled: {
-    backgroundColor: '#ccc',
-    color: '#666',
-    cursor: 'not-allowed'
-  },
-  buttonLocked: {
-    backgroundColor: '#2196F3',
-    color: 'white',
-    cursor: 'not-allowed',
-    opacity: 0.8
-  },
-  smallButton: {
-    padding: '6px 12px',
-    fontSize: '12px',
-    borderRadius: '3px',
-    border: '1px solid #4CAF50',
-    backgroundColor: 'white',
-    color: '#4CAF50',
-    cursor: 'pointer',
-    fontWeight: 'bold'
-  },
-  smallButtonSelected: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    borderColor: '#4CAF50'
-  },
-  hostageCounter: {
-    fontSize: '14px',
-    fontWeight: 'bold',
-    marginBottom: '10px',
-    textAlign: 'center' as const
-  },
-  voteButton: {
-    padding: '12px 20px',
-    fontSize: '14px',
-    borderRadius: '5px',
-    border: '2px solid #ddd',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    transition: 'all 0.2s',
-    minWidth: '120px'
-  },
-  voteButtonUnselected: {
-    backgroundColor: 'white',
-    color: '#333',
-    borderColor: '#ddd'
-  },
-  voteButtonSelected: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    borderColor: '#4CAF50'
-  },
-  voteButtonDisabled: {
-    backgroundColor: '#f5f5f5',
-    color: '#999',
-    cursor: 'not-allowed',
-    opacity: 0.6
-  },
-  checkmark: {
-    fontSize: '16px',
-    fontWeight: 'bold'
-  },
-  votedMessage: {
-    marginTop: '15px',
-    padding: '10px',
-    backgroundColor: '#e8f5e9',
-    borderRadius: '5px',
-    color: '#2e7d32',
-    fontWeight: 'bold',
-    textAlign: 'center' as const
-  },
-  pausedOverlay: {
-    position: 'fixed' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000
-  },
-  pausedMessage: {
-    backgroundColor: 'white',
-    padding: '40px',
-    borderRadius: '10px',
-    textAlign: 'center' as const
-  },
-  winner: {
-    fontSize: '24px',
-    textAlign: 'center' as const,
-    marginTop: '50px',
-    padding: '30px',
-    backgroundColor: '#FFD700',
-    borderRadius: '10px'
-  }
 };
