@@ -20,28 +20,41 @@ export const Lobby: React.FC<LobbyProps> = ({ gameView, isHost, onLockRoom }) =>
   const canLock = playerCount >= 6 && playerCount <= 30;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h1>Two Rooms and a Boom</h1>
-        <div style={styles.code}>
+    <div className="max-w-sm mx-auto p-4 font-sans sm:max-w-md lg:max-w-xl">
+      <div className="text-center mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4">Two Rooms and a Boom</h1>
+        <div className="flex justify-center items-center gap-2 text-base sm:text-lg">
           <span>Room Code:</span>
-          <span style={styles.codeValue}>{publicState.code}</span>
+          <span className="font-bold text-xl sm:text-2xl px-4 py-1 bg-gray-100 rounded-lg tracking-wider">
+            {publicState.code}
+          </span>
         </div>
       </div>
 
-      <div style={styles.content}>
-        <div style={styles.playerList}>
-          <h2>
+      <div className="bg-white rounded-lg p-5 shadow-sm sm:p-6">
+        <div className="mb-5">
+          <h2 className="text-xl sm:text-2xl font-bold mb-3">
             Players ({playerCount}/30)
-            {playerCount < 6 && <span style={styles.warning}> - Need 6+ to start</span>}
+            {playerCount < 6 && (
+              <span className="text-game-red text-sm font-normal"> - Need 6+ to start</span>
+            )}
           </h2>
-          <ul style={styles.list}>
+          <ul className="list-none p-0 m-0">
             {publicState.players.map((player) => (
-              <li key={player.id} style={styles.playerItem}>
-                {player.name}
-                {player.isHost && <span style={styles.badge}>HOST</span>}
+              <li
+                key={player.id}
+                className="min-h-touch p-3 border-b border-gray-200 flex items-center gap-2"
+              >
+                <span className="flex-1">{player.name}</span>
+                {player.isHost && (
+                  <span className="bg-game-green text-white px-2 py-0.5 rounded text-xs font-bold">
+                    HOST
+                  </span>
+                )}
                 {player.connectionStatus === 'DISCONNECTED' && (
-                  <span style={styles.disconnected}>DISCONNECTED</span>
+                  <span className="bg-game-red text-white px-2 py-0.5 rounded text-xs">
+                    DISCONNECTED
+                  </span>
                 )}
               </li>
             ))}
@@ -49,135 +62,32 @@ export const Lobby: React.FC<LobbyProps> = ({ gameView, isHost, onLockRoom }) =>
         </div>
 
         {isHost && !isLocked && (
-          <div style={styles.hostControls}>
+          <div className="text-center py-5">
             <button
               onClick={onLockRoom}
               disabled={!canLock}
-              style={{
-                ...styles.button,
-                ...(canLock ? styles.buttonEnabled : styles.buttonDisabled)
-              }}
+              className={`w-full min-h-touch px-6 py-3 text-base rounded-lg font-bold
+                          transition-all border-none cursor-pointer
+                          ${canLock
+                            ? 'bg-game-green text-white active:scale-95'
+                            : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
             >
               {canLock ? 'Lock Room' : `Need ${6 - playerCount} more players`}
             </button>
-            <p style={styles.hint}>Lock the room when all players have joined</p>
+            <p className="mt-3 text-sm text-gray-600">
+              Lock the room when all players have joined
+            </p>
           </div>
         )}
 
         {isLocked && (
-          <div style={styles.status}>
-            <p style={styles.statusText}>Room is locked. Waiting for host to select roles...</p>
+          <div className="text-center p-5 bg-gray-100 rounded-lg">
+            <p className="m-0 text-base text-gray-800">
+              Room is locked. Waiting for host to select roles...
+            </p>
           </div>
         )}
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '600px',
-    margin: '0 auto',
-    padding: '20px',
-    fontFamily: 'Arial, sans-serif'
-  },
-  header: {
-    textAlign: 'center' as const,
-    marginBottom: '30px'
-  },
-  code: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '10px',
-    fontSize: '18px',
-    marginTop: '10px'
-  },
-  codeValue: {
-    fontWeight: 'bold',
-    fontSize: '24px',
-    padding: '5px 15px',
-    backgroundColor: '#f0f0f0',
-    borderRadius: '5px',
-    letterSpacing: '2px'
-  },
-  content: {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    padding: '20px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-  },
-  playerList: {
-    marginBottom: '20px'
-  },
-  warning: {
-    color: '#ff6b6b',
-    fontSize: '14px',
-    fontWeight: 'normal'
-  },
-  list: {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0
-  },
-  playerItem: {
-    padding: '10px',
-    borderBottom: '1px solid #eee',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px'
-  },
-  badge: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    padding: '2px 8px',
-    borderRadius: '3px',
-    fontSize: '12px',
-    fontWeight: 'bold'
-  },
-  disconnected: {
-    backgroundColor: '#ff6b6b',
-    color: 'white',
-    padding: '2px 8px',
-    borderRadius: '3px',
-    fontSize: '12px'
-  },
-  hostControls: {
-    textAlign: 'center' as const,
-    padding: '20px 0'
-  },
-  button: {
-    padding: '12px 30px',
-    fontSize: '16px',
-    borderRadius: '5px',
-    border: 'none',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    transition: 'all 0.3s'
-  },
-  buttonEnabled: {
-    backgroundColor: '#4CAF50',
-    color: 'white'
-  },
-  buttonDisabled: {
-    backgroundColor: '#ccc',
-    color: '#666',
-    cursor: 'not-allowed'
-  },
-  hint: {
-    marginTop: '10px',
-    fontSize: '14px',
-    color: '#666'
-  },
-  status: {
-    textAlign: 'center' as const,
-    padding: '20px',
-    backgroundColor: '#f0f0f0',
-    borderRadius: '5px'
-  },
-  statusText: {
-    margin: 0,
-    fontSize: '16px',
-    color: '#333'
-  }
 };
