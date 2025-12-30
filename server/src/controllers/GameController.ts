@@ -569,13 +569,20 @@ export class GameController {
     // Get character info if role assigned
     let roleName: string | undefined;
     let teamColor: string | undefined;
+    let characterDefinition;
     if (player.currentRole) {
       const character = characterLoader.getCharacter(player.currentRole);
       if (character) {
         roleName = character.name;
         teamColor = character.team;
+        characterDefinition = character;
       }
     }
+
+    // Get all character definitions for roles in the current game
+    const gameRoles = game.config.selectedRoles
+      .map(roleId => characterLoader.getCharacter(roleId))
+      .filter(char => char !== undefined);
 
     // Convert players Map to array of PublicPlayerInfo
     const playersArray = Array.from(game.players.values()).map(p => ({
@@ -603,7 +610,9 @@ export class GameController {
         collectedCards: [],
         knownInformation: player.knownInformation,
         role: roleName,
-        team: teamColor
+        team: teamColor,
+        characterDefinition: characterDefinition,
+        gameRoles: gameRoles
       }
     };
   }

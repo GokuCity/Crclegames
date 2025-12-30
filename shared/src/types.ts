@@ -362,6 +362,8 @@ export interface PlayerPrivateState {
   knownInformation: KnownInfo[];
   role?: string; // Character name for easier access
   team?: TeamColor; // Team color for easier access
+  characterDefinition?: CharacterDefinition; // Full character details for UI display
+  gameRoles?: CharacterDefinition[]; // All roles in the current game
 }
 
 /**

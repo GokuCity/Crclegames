@@ -4,8 +4,9 @@
  * Main game interface with rooms, timer, and player actions.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlayerGameView, RoomId, GameStatus, TeamColor } from '@two-rooms/shared';
+import { RulesContent } from './RulesContent';
 
 interface GameBoardProps {
   gameView: PlayerGameView;
@@ -33,6 +34,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   // State for popup modals
   const [showColourShare, setShowColourShare] = useState(false);
   const [showCardShare, setShowCardShare] = useState(false);
+  const [showRules, setShowRules] = useState(false);
+  const [activeTab, setActiveTab] = useState<'howToPlay' | 'roles'>('howToPlay');
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
 
   // Determine team color for color share
   const getTeamColor = () => {
@@ -45,6 +49,27 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     if (playerPrivate?.team === TeamColor.GREY) return '#666666';
     return '#666666'; // Default grey
   };
+
+  // Helper function for role display in Rules modal
+  const getTeamColorForEnum = (team: TeamColor) => {
+    switch (team) {
+      case TeamColor.BLUE: return '#2196F3';
+      case TeamColor.RED: return '#ff6b6b';
+      case TeamColor.GREEN: return '#4CAF50';
+      case TeamColor.PURPLE: return '#9C27B0';
+      case TeamColor.BLACK: return '#000000';
+      case TeamColor.PINK: return '#E91E63';
+      case TeamColor.GREY: return '#666666';
+      default: return '#666666';
+    }
+  };
+
+  // Initialize selectedRoleId when Rules popup opens
+  useEffect(() => {
+    if (showRules && activeTab === 'roles' && !selectedRoleId && playerPrivate?.characterDefinition) {
+      setSelectedRoleId(playerPrivate.characterDefinition.id);
+    }
+  }, [showRules, activeTab, selectedRoleId, playerPrivate]);
 
   // Calculate required hostage count based on player count and round
   const calculateHostageCount = (playerCount: number, roundNumber: number): number => {
@@ -353,6 +378,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               >
                 Card Share
               </button>
+              <button
+                onClick={() => {
+                  setShowRules(true);
+                  setActiveTab('howToPlay');
+                }}
+                className="flex-1 min-h-touch px-6 py-3 text-base rounded-lg border-none font-bold
+                           transition-all cursor-pointer bg-purple-600 text-white active:scale-95"
+              >
+                Rules
+              </button>
             </div>
           </div>
         );
@@ -406,6 +441,134 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             <div className="text-xl mt-8 opacity-80">
               Tap anywhere to close
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rules Popup - Full screen with tabs */}
+      {showRules && (
+        <div className="fixed inset-0 z-50 bg-white flex flex-col">
+          {/* Header with close button */}
+          <div className="flex justify-between items-center p-4 border-b border-gray-300 bg-gray-50">
+            <h2 className="text-xl font-bold sm:text-2xl">Game Rules</h2>
+            <button
+              onClick={() => setShowRules(false)}
+              className="min-h-touch min-w-touch bg-gray-200 text-black rounded-full font-bold text-2xl
+                         flex items-center justify-center active:scale-95 transition-all"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="flex border-b border-gray-300 bg-gray-50">
+            <button
+              onClick={() => setActiveTab('howToPlay')}
+              className={`flex-1 py-3 px-4 font-bold transition-all ${
+                activeTab === 'howToPlay'
+                  ? 'border-b-4 border-game-blue text-game-blue'
+                  : 'text-gray-600'
+              }`}
+            >
+              How to Play
+            </button>
+            <button
+              onClick={() => setActiveTab('roles')}
+              className={`flex-1 py-3 px-4 font-bold transition-all ${
+                activeTab === 'roles'
+                  ? 'border-b-4 border-game-blue text-game-blue'
+                  : 'text-gray-600'
+              }`}
+            >
+              Roles
+            </button>
+          </div>
+
+          {/* Tab Content */}
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+            {activeTab === 'howToPlay' && <RulesContent />}
+
+            {activeTab === 'roles' && (
+              <div>
+                {/* Role Dropdown */}
+                <div className="mb-4">
+                  <label className="block text-sm font-bold mb-2">Select Role:</label>
+                  <select
+                    value={selectedRoleId || playerPrivate?.characterDefinition?.id || ''}
+                    onChange={(e) => setSelectedRoleId(e.target.value)}
+                    className="w-full p-3 border-2 border-gray-300 rounded-lg text-base"
+                  >
+                    {playerPrivate?.gameRoles?.map((role) => (
+                      <option key={role.id} value={role.id}>
+                        {role.name} {role.id === playerPrivate.characterDefinition?.id ? '(You)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Role Details Display */}
+                {(() => {
+                  const displayRole = playerPrivate?.gameRoles?.find(
+                    (r) => r.id === (selectedRoleId || playerPrivate?.characterDefinition?.id)
+                  );
+
+                  if (!displayRole) return null;
+
+                  return (
+                    <div className="space-y-4">
+                      {/* Role Name & Team */}
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="text-2xl font-bold">{displayRole.name}</h3>
+                        <span
+                          className="px-3 py-1 rounded font-bold text-white"
+                          style={{ backgroundColor: getTeamColorForEnum(displayRole.team) }}
+                        >
+                          {displayRole.team}
+                        </span>
+                        <span className="px-3 py-1 bg-gray-200 rounded font-bold">
+                          Complexity: {displayRole.complexity}/5
+                        </span>
+                      </div>
+
+                      {/* Description */}
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="font-bold mb-2">Description:</h4>
+                        <p>{displayRole.description}</p>
+                      </div>
+
+                      {/* Abilities */}
+                      {displayRole.abilities && displayRole.abilities.length > 0 && (
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <h4 className="font-bold mb-2">Abilities:</h4>
+                          {displayRole.abilities.map((ability, idx) => (
+                            <div key={idx} className="mb-2 last:mb-0">
+                              <p className="font-bold">{ability.name}</p>
+                              <p className="text-sm text-gray-600">
+                                Trigger: {ability.trigger}
+                                {ability.usageLimit && ` (${ability.usageLimit.count}/${ability.usageLimit.per})`}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Win Conditions */}
+                      {displayRole.winConditions && displayRole.winConditions.length > 0 && (
+                        <div className="bg-green-50 p-4 rounded-lg">
+                          <h4 className="font-bold mb-2">Win Conditions:</h4>
+                          {displayRole.winConditions.map((wc, idx) => (
+                            <p key={idx} className="text-sm">
+                              • {wc.type} {wc.overridesTeam ? '(Overrides team goal)' : ''}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
           </div>
         </div>
       )}

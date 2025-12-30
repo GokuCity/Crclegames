@@ -270,6 +270,8 @@ export interface PlayerPrivateState {
     knownInformation: KnownInfo[];
     role?: string;
     team?: TeamColor;
+    characterDefinition?: CharacterDefinition;
+    gameRoles?: CharacterDefinition[];
 }
 /**
  * Player's view of the game state
