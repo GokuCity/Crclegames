@@ -4,8 +4,8 @@
  * Main game interface with rooms, timer, and player actions.
  */
 
-import React from 'react';
-import { PlayerGameView, RoomId, GameStatus } from '@two-rooms/shared';
+import React, { useState } from 'react';
+import { PlayerGameView, RoomId, GameStatus, TeamColor } from '@two-rooms/shared';
 
 interface GameBoardProps {
   gameView: PlayerGameView;
@@ -29,6 +29,22 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const currentPlayer = publicState.players.find((p) => p.id === playerId);
   const myRoom = publicState.roomAssignments[playerId];
   const isLeader = currentPlayer?.isLeader || false;
+
+  // State for popup modals
+  const [showColourShare, setShowColourShare] = useState(false);
+  const [showCardShare, setShowCardShare] = useState(false);
+
+  // Determine team color for color share
+  const getTeamColor = () => {
+    if (playerPrivate?.team === TeamColor.BLUE) return '#2196F3';
+    if (playerPrivate?.team === TeamColor.RED) return '#ff6b6b';
+    if (playerPrivate?.team === TeamColor.GREEN) return '#4CAF50';
+    if (playerPrivate?.team === TeamColor.PURPLE) return '#9C27B0';
+    if (playerPrivate?.team === TeamColor.BLACK) return '#000000';
+    if (playerPrivate?.team === TeamColor.PINK) return '#E91E63';
+    if (playerPrivate?.team === TeamColor.GREY) return '#666666';
+    return '#666666'; // Default grey
+  };
 
   // Calculate required hostage count based on player count and round
   const calculateHostageCount = (playerCount: number, roundNumber: number): number => {
@@ -311,18 +327,88 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 )}
               </>
             )}
-            {!votingActive && !isLeader && publicState.currentRound > 1 && (
+
+            {/* Action buttons - always visible */}
+            <div className="flex flex-col gap-3 mt-4 sm:flex-row sm:gap-4">
+              {!votingActive && (
+                <button
+                  onClick={() => onInitiateNewLeaderVote(myRoom)}
+                  className="flex-1 min-h-touch px-6 py-3 text-base rounded-lg border-none font-bold
+                             transition-all cursor-pointer bg-game-green text-white active:scale-95"
+                >
+                  Vote for New Leader
+                </button>
+              )}
               <button
-                onClick={() => onInitiateNewLeaderVote(myRoom)}
-                className="w-full min-h-touch px-6 py-3 text-base rounded-lg border-none font-bold
-                           transition-all cursor-pointer bg-game-green text-white active:scale-95"
+                onClick={() => setShowColourShare(true)}
+                className="flex-1 min-h-touch px-6 py-3 text-base rounded-lg border-none font-bold
+                           transition-all cursor-pointer bg-game-blue text-white active:scale-95"
               >
-                Vote for New Leader
+                Colour Share
               </button>
-            )}
+              <button
+                onClick={() => setShowCardShare(true)}
+                className="flex-1 min-h-touch px-6 py-3 text-base rounded-lg border-none font-bold
+                           transition-all cursor-pointer bg-game-gold text-black active:scale-95"
+              >
+                Card Share
+              </button>
+            </div>
           </div>
         );
       })()}
+
+      {/* Colour Share Popup - Full screen with just the color */}
+      {showColourShare && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ backgroundColor: getTeamColor() }}
+          onClick={() => setShowColourShare(false)}
+        >
+          <button
+            onClick={() => setShowColourShare(false)}
+            className="absolute top-4 right-4 min-h-touch min-w-touch bg-white bg-opacity-90 text-black
+                       rounded-full font-bold text-2xl flex items-center justify-center
+                       active:scale-95 transition-all shadow-lg"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+          <div className="text-white text-4xl font-bold text-center px-4 select-none">
+            Tap anywhere to close
+          </div>
+        </div>
+      )}
+
+      {/* Card Share Popup - Full screen with color and role */}
+      {showCardShare && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center p-8"
+          style={{ backgroundColor: getTeamColor() }}
+          onClick={() => setShowCardShare(false)}
+        >
+          <button
+            onClick={() => setShowCardShare(false)}
+            className="absolute top-4 right-4 min-h-touch min-w-touch bg-white bg-opacity-90 text-black
+                       rounded-full font-bold text-2xl flex items-center justify-center
+                       active:scale-95 transition-all shadow-lg"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+          <div className="text-white text-center select-none">
+            <div className="text-6xl font-bold mb-8 sm:text-7xl md:text-8xl">
+              {playerPrivate?.role || 'Unknown'}
+            </div>
+            <div className="text-3xl font-bold sm:text-4xl md:text-5xl">
+              Team: {playerPrivate?.team || 'Unknown'}
+            </div>
+            <div className="text-xl mt-8 opacity-80">
+              Tap anywhere to close
+            </div>
+          </div>
+        </div>
+      )}
 
       {publicState.paused && !isHostageSelectionPhase && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
