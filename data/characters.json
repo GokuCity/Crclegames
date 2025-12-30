@@ -1,0 +1,313 @@
+{
+  "characters": [
+    {
+      "id": "president",
+      "name": "President",
+      "team": "BLUE",
+      "class": "PRIMARY",
+      "description": "Blue Team wins if you survive (not in the same room as the Bomber at game end)",
+      "complexity": 1,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [],
+      "winConditions": [
+        {
+          "type": "TEAM_WINS",
+          "priority": 100,
+          "overridesTeam": false,
+          "parameters": {}
+        }
+      ]
+    },
+    {
+      "id": "bomber",
+      "name": "Bomber",
+      "team": "RED",
+      "class": "PRIMARY",
+      "description": "Red Team wins if you are in the same room as the President at game end",
+      "complexity": 1,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [
+        {
+          "id": "bomber_detonation",
+          "name": "Detonation",
+          "trigger": "GAME_END",
+          "effect": "CUSTOM",
+          "targeting": {
+            "type": "ALL_IN_ROOM"
+          },
+          "priority": 1000,
+          "parameters": {
+            "evaluator": "bomberDetonation"
+          }
+        }
+      ],
+      "winConditions": [
+        {
+          "type": "TEAM_WINS",
+          "priority": 100,
+          "overridesTeam": false,
+          "parameters": {}
+        }
+      ]
+    },
+    {
+      "id": "blue_team_member",
+      "name": "Blue Team Member",
+      "team": "BLUE",
+      "class": "REGULAR",
+      "description": "Blue Team member with no special abilities. You win if the President survives.",
+      "complexity": 1,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [],
+      "winConditions": [
+        {
+          "type": "TEAM_WINS",
+          "priority": 100,
+          "overridesTeam": false,
+          "parameters": {}
+        }
+      ]
+    },
+    {
+      "id": "red_team_member",
+      "name": "Red Team Member",
+      "team": "RED",
+      "class": "REGULAR",
+      "description": "Red Team member with no special abilities. You win if the Bomber kills the President.",
+      "complexity": 1,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [],
+      "winConditions": [
+        {
+          "type": "TEAM_WINS",
+          "priority": 100,
+          "overridesTeam": false,
+          "parameters": {}
+        }
+      ]
+    },
+    {
+      "id": "gambler",
+      "name": "Gambler",
+      "team": "GREY",
+      "class": "REGULAR",
+      "description": "Win by correctly guessing which team wins. Make your prediction at game end.",
+      "complexity": 2,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [],
+      "winConditions": [
+        {
+          "type": "CORRECT_GUESS",
+          "priority": 150,
+          "overridesTeam": true,
+          "parameters": {}
+        }
+      ]
+    },
+    {
+      "id": "agent_blue",
+      "name": "Agent (Blue)",
+      "team": "BLUE",
+      "class": "REGULAR",
+      "description": "Once per round, privately reveal your card to force another player to card share with you.",
+      "complexity": 3,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [
+        {
+          "id": "agent_force_share",
+          "name": "Agent Power",
+          "trigger": "MANUAL",
+          "effect": "FORCE_CARD_SHARE",
+          "targeting": {
+            "type": "SINGLE_PLAYER"
+          },
+          "usageLimit": {
+            "count": 1,
+            "per": "ROUND"
+          },
+          "priority": 50,
+          "parameters": {
+            "requiresPrivateReveal": true
+          }
+        }
+      ],
+      "winConditions": [
+        {
+          "type": "TEAM_WINS",
+          "priority": 100,
+          "overridesTeam": false,
+          "parameters": {}
+        }
+      ]
+    },
+    {
+      "id": "agent_red",
+      "name": "Agent (Red)",
+      "team": "RED",
+      "class": "REGULAR",
+      "description": "Once per round, privately reveal your card to force another player to card share with you.",
+      "complexity": 3,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [
+        {
+          "id": "agent_force_share",
+          "name": "Agent Power",
+          "trigger": "MANUAL",
+          "effect": "FORCE_CARD_SHARE",
+          "targeting": {
+            "type": "SINGLE_PLAYER"
+          },
+          "usageLimit": {
+            "count": 1,
+            "per": "ROUND"
+          },
+          "priority": 50,
+          "parameters": {
+            "requiresPrivateReveal": true
+          }
+        }
+      ],
+      "winConditions": [
+        {
+          "type": "TEAM_WINS",
+          "priority": 100,
+          "overridesTeam": false,
+          "parameters": {}
+        }
+      ]
+    },
+    {
+      "id": "doctor",
+      "name": "Doctor",
+      "team": "BLUE",
+      "class": "REGULAR",
+      "description": "Blue Team loses unless the President card shares with you before game end.",
+      "complexity": 2,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [],
+      "winConditions": [
+        {
+          "type": "CARD_SHARED_WITH",
+          "priority": 200,
+          "overridesTeam": false,
+          "parameters": {
+            "character": "president",
+            "failureCondition": "RED_TEAM_WINS"
+          }
+        }
+      ]
+    },
+    {
+      "id": "engineer",
+      "name": "Engineer",
+      "team": "RED",
+      "class": "REGULAR",
+      "description": "Red Team loses unless the Bomber card shares with you before game end.",
+      "complexity": 2,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [],
+      "winConditions": [
+        {
+          "type": "CARD_SHARED_WITH",
+          "priority": 200,
+          "overridesTeam": false,
+          "parameters": {
+            "character": "bomber",
+            "failureCondition": "BLUE_TEAM_WINS"
+          }
+        }
+      ]
+    },
+    {
+      "id": "survivor",
+      "name": "Survivor",
+      "team": "GREY",
+      "class": "REGULAR",
+      "description": "Win if you are NOT in the same room as the Bomber at game end.",
+      "complexity": 2,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [],
+      "winConditions": [
+        {
+          "type": "NOT_WITH_CHARACTERS",
+          "priority": 150,
+          "overridesTeam": true,
+          "parameters": {
+            "characters": ["bomber"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "rival",
+      "name": "Rival",
+      "team": "GREY",
+      "class": "REGULAR",
+      "description": "Win if you are NOT in the same room as the President at game end.",
+      "complexity": 2,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [],
+      "winConditions": [
+        {
+          "type": "NOT_WITH_CHARACTERS",
+          "priority": 150,
+          "overridesTeam": true,
+          "parameters": {
+            "characters": ["president"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "mi6",
+      "name": "MI6",
+      "team": "GREY",
+      "class": "REGULAR",
+      "description": "Win if you card share with both the President AND the Bomber during the game.",
+      "complexity": 3,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [],
+      "winConditions": [
+        {
+          "type": "CUSTOM",
+          "priority": 150,
+          "overridesTeam": true,
+          "parameters": {
+            "evaluator": "mi6WinCondition"
+          }
+        }
+      ]
+    },
+    {
+      "id": "born_leader",
+      "name": "Born Leader",
+      "team": "GREY",
+      "class": "REGULAR",
+      "description": "Win if you are a leader at the end of the game.",
+      "complexity": 2,
+      "requires": [],
+      "mutuallyExclusive": [],
+      "abilities": [],
+      "winConditions": [
+        {
+          "type": "IS_LEADER",
+          "priority": 150,
+          "overridesTeam": true,
+          "parameters": {}
+        }
+      ]
+    }
+  ]
+}
