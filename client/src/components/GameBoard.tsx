@@ -64,12 +64,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     }
   };
 
-  // Initialize selectedRoleId when Rules popup opens
+  // Initialize selectedRoleId when Rules popup opens to Roles tab
   useEffect(() => {
-    if (showRules && activeTab === 'roles' && !selectedRoleId && playerPrivate?.characterDefinition) {
-      setSelectedRoleId(playerPrivate.characterDefinition.id);
+    if (showRules && activeTab === 'roles' && playerPrivate?.characterDefinition) {
+      // Always reset to player's role when opening Roles tab
+      if (!selectedRoleId || selectedRoleId !== playerPrivate.characterDefinition.id) {
+        setSelectedRoleId(playerPrivate.characterDefinition.id);
+      }
     }
-  }, [showRules, activeTab, selectedRoleId, playerPrivate]);
+  }, [showRules, activeTab, playerPrivate]);
 
   // Calculate required hostage count based on player count and round
   const calculateHostageCount = (playerCount: number, roundNumber: number): number => {
@@ -491,29 +494,44 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
             {activeTab === 'roles' && (
               <div>
-                {/* Role Dropdown */}
-                <div className="mb-4">
-                  <label className="block text-sm font-bold mb-2">Select Role:</label>
-                  <select
-                    value={selectedRoleId || playerPrivate?.characterDefinition?.id || ''}
-                    onChange={(e) => setSelectedRoleId(e.target.value)}
-                    className="w-full p-3 border-2 border-gray-300 rounded-lg text-base"
-                  >
-                    {playerPrivate?.gameRoles?.map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.name} {role.id === playerPrivate.characterDefinition?.id ? '(You)' : ''}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {/* Role Dropdown - only show if there are multiple roles */}
+                {playerPrivate?.gameRoles && playerPrivate.gameRoles.length > 1 && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2">Select Role:</label>
+                    <select
+                      value={selectedRoleId || playerPrivate?.characterDefinition?.id || ''}
+                      onChange={(e) => setSelectedRoleId(e.target.value)}
+                      className="w-full p-3 border-2 border-gray-300 rounded-lg text-base"
+                    >
+                      {playerPrivate.gameRoles.map((role) => (
+                        <option key={role.id} value={role.id}>
+                          {role.name} {role.id === playerPrivate.characterDefinition?.id ? '(You)' : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 {/* Role Details Display */}
                 {(() => {
-                  const displayRole = playerPrivate?.gameRoles?.find(
+                  // Try to find the role from gameRoles first, otherwise use characterDefinition
+                  let displayRole = playerPrivate?.gameRoles?.find(
                     (r) => r.id === (selectedRoleId || playerPrivate?.characterDefinition?.id)
                   );
 
-                  if (!displayRole) return null;
+                  // If no role found in gameRoles, use the player's characterDefinition directly
+                  if (!displayRole && playerPrivate?.characterDefinition) {
+                    displayRole = playerPrivate.characterDefinition;
+                  }
+
+                  if (!displayRole) {
+                    return (
+                      <div className="text-center text-gray-500 mt-8">
+                        <p>No role information available yet.</p>
+                        <p className="text-sm mt-2">Roles will be displayed once the game starts.</p>
+                      </div>
+                    );
+                  }
 
                   return (
                     <div className="space-y-4">
