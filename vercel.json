@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build:client",
+  "buildCommand": "cd shared && npm install && npm run build && cd ../client && npm install && tsc && vite build",
   "outputDirectory": "client/dist",
   "framework": null,
   "installCommand": "npm install --legacy-peer-deps"
