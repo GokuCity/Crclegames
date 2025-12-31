@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm install --prefix shared && npm run build --prefix shared && npm install --prefix client && cd client && tsc && vite build",
+  "buildCommand": "cd $VERCEL_PROJECT_ROOT/shared && npm install && npm run build && cd $VERCEL_PROJECT_ROOT/client && npm install && tsc && vite build",
   "outputDirectory": "client/dist",
   "framework": null,
   "installCommand": "npm install --legacy-peer-deps"
