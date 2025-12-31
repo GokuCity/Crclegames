@@ -1,0 +1,8 @@
+node_modules
+.git
+*.log
+.env
+.DS_Store
+client/node_modules
+server/node_modules
+shared/node_modules

@@ -13,6 +13,7 @@
     "dev:server": "npm run dev --workspace=server",
     "dev:client": "npm run dev --workspace=client",
     "build": "npm run build --workspaces",
+    "build:client": "cd client && npm run vercel-build",
     "test": "npm run test --workspaces"
   },
   "devDependencies": {
