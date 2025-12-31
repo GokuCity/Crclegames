@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "cd ../shared && npm run build && cd ../client && tsc && vite build",
-    "build:client": "cd ../shared && npm install && npm run build && cd ../client && npm install && tsc && vite build",
-    "vercel-build": "cd ../shared && npm install && npm run build && cd ../client && npm install && tsc && vite build",
+    "build": "npm run build --prefix ../shared && tsc && vite build",
+    "build:client": "npm install --prefix ../shared && npm run build --prefix ../shared && npm install && tsc && vite build",
+    "vercel-build": "npm install --prefix ../shared && npm run build --prefix ../shared && npm install && tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
