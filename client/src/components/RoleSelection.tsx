@@ -11,6 +11,7 @@ interface RoleSelectionProps {
   gameView: PlayerGameView;
   isHost: boolean;
   onSelectRoles: (roles: CharacterId[]) => void;
+  onSetRounds: (totalRounds: 3 | 5) => void;
   onConfirmRoles: () => void;
   onStartGame: () => void;
 }
@@ -29,18 +30,55 @@ const AVAILABLE_CHARACTERS: Array<{ id: CharacterId; name: string; team: string 
   { id: 'survivor' as CharacterId, name: 'Survivor', team: 'GREY' },
   { id: 'rival' as CharacterId, name: 'Rival', team: 'GREY' },
   { id: 'mi6' as CharacterId, name: 'MI6', team: 'GREY' },
-  { id: 'born_leader' as CharacterId, name: 'Born Leader', team: 'GREY' }
+  { id: 'born_leader' as CharacterId, name: 'Born Leader', team: 'GREY' },
+  { id: 'coyboy_blue' as CharacterId, name: 'Coyboy (Blue)', team: 'BLUE' },
+  { id: 'coyboy_red' as CharacterId, name: 'Coyboy (Red)', team: 'RED' },
+  { id: 'conspirator_blue' as CharacterId, name: 'Conspirator (Blue)', team: 'BLUE' },
+  { id: 'conspirator_red' as CharacterId, name: 'Conspirator (Red)', team: 'RED' },
+  { id: 'clone' as CharacterId, name: 'Clone', team: 'GREY' },
+  { id: 'cleaner_blue' as CharacterId, name: 'Cleaner (Blue)', team: 'BLUE' },
+  { id: 'cleaner_red' as CharacterId, name: 'Cleaner (Red)', team: 'RED' },
+  { id: 'butler' as CharacterId, name: 'Butler', team: 'GREY' },
+  { id: 'maid' as CharacterId, name: 'Maid', team: 'GREY' },
+  { id: 'cult_leader' as CharacterId, name: 'Cult Leader', team: 'GREY' },
+  { id: 'enforcer_blue' as CharacterId, name: 'Enforcer (Blue)', team: 'BLUE' },
+  { id: 'enforcer_red' as CharacterId, name: 'Enforcer (Red)', team: 'RED' },
+  { id: 'enlisted_blue' as CharacterId, name: 'Enlisted (Blue)', team: 'BLUE' },
+  { id: 'enlisted_red' as CharacterId, name: 'Enlisted (Red)', team: 'RED' },
+  { id: 'cupid' as CharacterId, name: 'Cupid', team: 'RED' },
+  { id: 'eris' as CharacterId, name: 'Eris', team: 'BLUE' },
+  { id: 'fool_blue' as CharacterId, name: 'Fool (Blue)', team: 'BLUE' },
+  { id: 'fool_red' as CharacterId, name: 'Fool (Red)', team: 'RED' },
+  { id: 'hot_potato' as CharacterId, name: 'Hot Potato', team: 'GREY' },
+  { id: 'immunologist_blue' as CharacterId, name: 'Immunologist (Blue)', team: 'BLUE' },
+  { id: 'immunologist_red' as CharacterId, name: 'Immunologist (Red)', team: 'RED' },
+  { id: 'intern' as CharacterId, name: 'Intern', team: 'GREY' },
+  { id: 'victim' as CharacterId, name: 'Victim', team: 'GREY' },
+  { id: 'interrogator_blue' as CharacterId, name: 'Interrogator (Blue)', team: 'BLUE' },
+  { id: 'interrogator_red' as CharacterId, name: 'Interrogator (Red)', team: 'RED' },
+  { id: 'romeo' as CharacterId, name: 'Romeo', team: 'GREY' },
+  { id: 'juliet' as CharacterId, name: 'Juliet', team: 'GREY' },
+  { id: 'mayor_blue' as CharacterId, name: 'Mayor (Blue)', team: 'BLUE' },
+  { id: 'mayor_red' as CharacterId, name: 'Mayor (Red)', team: 'RED' },
+  { id: 'thug_blue' as CharacterId, name: 'Thug (Blue)', team: 'BLUE' },
+  { id: 'thug_red' as CharacterId, name: 'Thug (Red)', team: 'RED' },
+  { id: 'traveler' as CharacterId, name: 'Traveler', team: 'GREY' },
+  { id: 'usurper_blue' as CharacterId, name: 'Usurper (Blue)', team: 'BLUE' },
+  { id: 'usurper_red' as CharacterId, name: 'Usurper (Red)', team: 'RED' },
+  { id: 'zombie' as CharacterId, name: 'Zombie', team: 'GREEN' }
 ];
 
 export const RoleSelection: React.FC<RoleSelectionProps> = ({
   gameView,
   isHost,
   onSelectRoles,
+  onSetRounds,
   onConfirmRoles,
   onStartGame
 }) => {
   const [selectedRoles, setSelectedRoles] = useState<CharacterId[]>([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [totalRounds, setTotalRounds] = useState<3 | 5>(3);
 
   const { public: publicState } = gameView;
   const playerCount = publicState.players.length;
@@ -95,6 +133,7 @@ export const RoleSelection: React.FC<RoleSelectionProps> = ({
   const handleConfirm = () => {
     if (validationErrors.length === 0) {
       onSelectRoles(selectedRoles);
+      onSetRounds(totalRounds);
       onConfirmRoles();
     }
   };
@@ -153,6 +192,40 @@ export const RoleSelection: React.FC<RoleSelectionProps> = ({
         <h2 className="text-xl sm:text-2xl font-bold mb-2">Select Roles</h2>
         <p className="text-base">
           Choose {requiredCount} roles ({selectedRoles.length}/{requiredCount})
+        </p>
+      </div>
+
+      {/* Round Selection */}
+      <div className="bg-gray-100 p-4 rounded-lg mb-5">
+        <h3 className="text-lg font-bold mb-3 text-center">Number of Rounds</h3>
+        <div className="flex gap-3 justify-center">
+          <button
+            onClick={() => setTotalRounds(3)}
+            className={`min-h-touch px-8 py-3 text-base rounded-lg font-bold
+                        transition-all border-2
+                        ${totalRounds === 3
+                          ? 'bg-game-green text-white border-game-green'
+                          : 'bg-white text-game-gray-dark border-gray-300'
+                        } cursor-pointer active:scale-95`}
+          >
+            3 Rounds
+          </button>
+          <button
+            onClick={() => setTotalRounds(5)}
+            className={`min-h-touch px-8 py-3 text-base rounded-lg font-bold
+                        transition-all border-2
+                        ${totalRounds === 5
+                          ? 'bg-game-green text-white border-game-green'
+                          : 'bg-white text-game-gray-dark border-gray-300'
+                        } cursor-pointer active:scale-95`}
+          >
+            5 Rounds
+          </button>
+        </div>
+        <p className="text-sm text-gray-600 text-center mt-3">
+          {totalRounds === 3
+            ? 'Rounds: 3min, 2min, 1min'
+            : 'Rounds: 5min, 4min, 3min, 2min, 1min'}
         </p>
       </div>
 

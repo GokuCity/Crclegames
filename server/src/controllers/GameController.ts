@@ -239,6 +239,54 @@ export class GameController {
   // ============================================================================
 
   /**
+   * Set rounds
+   */
+  setRounds(
+    gameId: string,
+    playerId: string,
+    totalRounds: 3 | 5
+  ): Result<void> {
+    const game = gameStore.get(gameId);
+
+    if (!game) {
+      return { success: false, error: 'Game not found' };
+    }
+
+    const player = game.players.get(playerId);
+    if (!player || !player.isHost) {
+      return { success: false, error: 'Only host can set rounds' };
+    }
+
+    // Update game configuration with new rounds and durations
+    game.config.totalRounds = totalRounds;
+
+    // Set round durations based on total rounds
+    if (totalRounds === 3) {
+      // 3 rounds: 3min, 2min, 1min
+      game.config.roundDurations = [180000, 120000, 60000];
+    } else {
+      // 5 rounds: 5min, 4min, 3min, 2min, 1min
+      game.config.roundDurations = [300000, 240000, 180000, 120000, 60000];
+    }
+
+    gameStore.update(game);
+
+    // Broadcast rounds updated
+    eventBus.broadcast(
+      game.id,
+      ServerEventType.GAME_CONFIG_UPDATED,
+      {
+        totalRounds: game.config.totalRounds,
+        roundDurations: game.config.roundDurations
+      },
+      'PUBLIC'
+    );
+
+    console.log(`Rounds set to ${totalRounds} for game ${game.id}`);
+    return { success: true };
+  }
+
+  /**
    * Select roles
    */
   selectRoles(

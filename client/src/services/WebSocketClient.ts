@@ -125,7 +125,10 @@ export class WebSocketClient {
     }
 
     try {
-      this.ws.send(JSON.stringify(action));
+      const message = JSON.stringify(action);
+      console.log('📤 Sending WebSocket message:', message);
+      console.log('📤 Action object:', action);
+      this.ws.send(message);
     } catch (error) {
       console.error('Failed to send action:', error);
     }

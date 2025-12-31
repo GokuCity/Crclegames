@@ -67,12 +67,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   // Initialize selectedRoleId when Rules popup opens to Roles tab
   useEffect(() => {
     if (showRules && activeTab === 'roles' && playerPrivate?.characterDefinition) {
-      // Always reset to player's role when opening Roles tab
-      if (!selectedRoleId || selectedRoleId !== playerPrivate.characterDefinition.id) {
+      // Only set if selectedRoleId is null (first time opening)
+      if (selectedRoleId === null) {
         setSelectedRoleId(playerPrivate.characterDefinition.id);
       }
     }
-  }, [showRules, activeTab, playerPrivate]);
+  }, [showRules, activeTab]);
 
   // Calculate required hostage count based on player count and round
   const calculateHostageCount = (playerCount: number, roundNumber: number): number => {

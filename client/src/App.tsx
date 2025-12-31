@@ -178,6 +178,7 @@ function App() {
           gameView={game.gameView}
           isHost={isHost}
           onSelectRoles={game.selectRoles}
+          onSetRounds={game.setRounds}
           onConfirmRoles={game.confirmRoles}
           onStartGame={game.startGame}
         />

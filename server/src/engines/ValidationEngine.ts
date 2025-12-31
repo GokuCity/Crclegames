@@ -300,6 +300,7 @@ class ActionValidator implements Validator {
       case ClientActionType.LOCK_ROOM:
       case ClientActionType.UNLOCK_ROOM:
       case ClientActionType.SELECT_ROLES:
+      case ClientActionType.SET_ROUNDS:
       case ClientActionType.CONFIRM_ROLES:
       case ClientActionType.START_GAME:
         return player.isHost;
@@ -334,6 +335,7 @@ class ActionValidator implements Validator {
         return status === 'LOCKED';
 
       case ClientActionType.SELECT_ROLES:
+      case ClientActionType.SET_ROUNDS:
       case ClientActionType.CONFIRM_ROLES:
         return status === 'ROLE_SELECTION' || status === 'LOCKED';
 

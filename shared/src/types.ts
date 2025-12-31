@@ -405,6 +405,7 @@ export enum ClientActionType {
 
   // Role selection
   SELECT_ROLES = 'SELECT_ROLES',
+  SET_ROUNDS = 'SET_ROUNDS',
   CONFIRM_ROLES = 'CONFIRM_ROLES',
 
   // Game actions
@@ -457,6 +458,7 @@ export enum ServerEventType {
   // Role selection
   ROLES_SELECTED = 'ROLES_SELECTED',
   ROLE_ASSIGNED = 'ROLE_ASSIGNED',
+  GAME_CONFIG_UPDATED = 'GAME_CONFIG_UPDATED',
 
   // Round events
   ROUND_STARTED = 'ROUND_STARTED',

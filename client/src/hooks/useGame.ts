@@ -22,6 +22,7 @@ export interface UseGameResult {
   joinGame: (code: string, playerName: string) => Promise<void>;
   lockRoom: () => void;
   selectRoles: (roles: CharacterId[]) => void;
+  setRounds: (totalRounds: 3 | 5) => void;
   confirmRoles: () => void;
   startGame: () => void;
   nominateLeader: (roomId: RoomId, candidateId: string) => void;
@@ -187,6 +188,17 @@ export function useGame(): UseGameResult {
   );
 
   /**
+   * Set rounds
+   */
+  const setRounds = useCallback(
+    (totalRounds: 3 | 5) => {
+      if (!playerId) return;
+      gameClient.setRounds(playerId, totalRounds);
+    },
+    [playerId]
+  );
+
+  /**
    * Confirm roles
    */
   const confirmRoles = useCallback(() => {
@@ -285,6 +297,7 @@ export function useGame(): UseGameResult {
     joinGame,
     lockRoom,
     selectRoles,
+    setRounds,
     confirmRoles,
     startGame,
     nominateLeader,

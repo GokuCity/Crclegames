@@ -184,6 +184,7 @@ export var ClientActionType;
     ClientActionType["UNLOCK_ROOM"] = "UNLOCK_ROOM";
     // Role selection
     ClientActionType["SELECT_ROLES"] = "SELECT_ROLES";
+    ClientActionType["SET_ROUNDS"] = "SET_ROUNDS";
     ClientActionType["CONFIRM_ROLES"] = "CONFIRM_ROLES";
     // Game actions
     ClientActionType["START_GAME"] = "START_GAME";
@@ -222,6 +223,7 @@ export var ServerEventType;
     // Role selection
     ServerEventType["ROLES_SELECTED"] = "ROLES_SELECTED";
     ServerEventType["ROLE_ASSIGNED"] = "ROLE_ASSIGNED";
+    ServerEventType["GAME_CONFIG_UPDATED"] = "GAME_CONFIG_UPDATED";
     // Round events
     ServerEventType["ROUND_STARTED"] = "ROUND_STARTED";
     ServerEventType["ROUND_ENDED"] = "ROUND_ENDED";

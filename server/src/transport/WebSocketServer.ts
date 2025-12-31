@@ -194,11 +194,14 @@ export class WebSocketServer {
    */
   private async handleMessage(connection: Connection, data: Buffer): Promise<void> {
     try {
-      const message = JSON.parse(data.toString());
+      const rawMessage = data.toString();
+      console.log('📨 Raw WebSocket message:', rawMessage);
+      const message = JSON.parse(rawMessage);
 
       // Validate message structure
       if (!message.type || !message.payload) {
-        console.error('Invalid message format:', message);
+        console.error('❌ Invalid message format:', message);
+        console.error('❌ Raw message was:', rawMessage);
         return;
       }
 

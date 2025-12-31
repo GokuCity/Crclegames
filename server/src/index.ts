@@ -173,7 +173,10 @@ function handleCreateGame(
 
       if (result.success && result.data) {
         res.writeHead(201, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result.data));
+        res.end(JSON.stringify({
+          ...result.data,
+          playerName: hostName
+        }));
       } else {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: result.error }));
@@ -215,7 +218,11 @@ function handleJoinGame(
 
       if (result.success && result.data) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result.data));
+        res.end(JSON.stringify({
+          ...result.data,
+          playerName: playerName,
+          code: code
+        }));
       } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: result.error }));
@@ -273,6 +280,14 @@ async function handleWebSocketMessage(
           connection.gameId!,
           action.playerId,
           action.payload.roles
+        );
+        break;
+
+      case ClientActionType.SET_ROUNDS:
+        result = gameController.setRounds(
+          connection.gameId!,
+          action.playerId,
+          action.payload.totalRounds
         );
         break;
 

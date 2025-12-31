@@ -129,6 +129,19 @@ export class GameClient {
   }
 
   /**
+   * Set rounds
+   */
+  setRounds(playerId: string, totalRounds: 3 | 5): void {
+    console.log('🔍 ClientActionType.SET_ROUNDS =', ClientActionType.SET_ROUNDS);
+    console.log('🔍 Full ClientActionType enum:', ClientActionType);
+    this.sendAction({
+      type: ClientActionType.SET_ROUNDS,
+      playerId,
+      payload: { totalRounds }
+    });
+  }
+
+  /**
    * Confirm roles
    */
   confirmRoles(playerId: string): void {
