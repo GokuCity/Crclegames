@@ -1,0 +1,11 @@
+node_modules
+.git
+.env
+.env.*
+*.log
+coverage
+.vscode
+.idea
+vercel.json
+.vercelignore
+two-rooms-and-a-boom.zip
